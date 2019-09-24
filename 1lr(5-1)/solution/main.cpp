@@ -1,6 +1,8 @@
 #include <iostream>
 #include "Vector.hpp"
 
+const int MD5_LENGTH = 32;
+
 struct keyVal {
 	char key[33];
 	char value[65];
@@ -29,7 +31,7 @@ void countingSortInDig(TVector <keyVal>& unsorted, const int dig) {
 }
 
 void radixSort(TVector<keyVal>& unsorted) {
-    for (int i = 3; i >= 0; i--) {
+    for (int i = MD5_LENGTH - 1; i >= 0; i--) {
         countingSortInDig(unsorted, i);
     }
 }
