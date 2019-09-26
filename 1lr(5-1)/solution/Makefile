@@ -6,4 +6,3 @@ LDFLAGS =
 solution: main.cpp Vector.hpp
 	$(CC) $(CCFLAGS) main.cpp -o solution
 clean:
-	rm *.out

@@ -37,6 +37,7 @@ void radixSort(TVector<keyVal>& unsorted) {
 }
 
 int main(void) {
+     std::ios::sync_with_stdio(false);
 	 TVector <keyVal> entries;
 	 keyVal tmp;
 	 while(std::cin >> tmp.key >> tmp.value) {
