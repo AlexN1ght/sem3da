@@ -8,31 +8,31 @@ struct keyVal {
 	char value[65];
 };
 
-int atoi(char a) {
+int Atoi(char a) {
     if (a >= 'a') {
         return a -'a' + 10;
     }
     return a - '0';
 }
 
-void countingSortInDig(TVector <keyVal>& unsorted, const int dig) {
+void CountingSortInDig(TVector <keyVal>& unsorted, const int dig) {
     int count[16]{0};
-    TVector <keyVal> out(unsorted.size());
-    for (int i = 0; i <  unsorted.size(); i++) {
-	    count[atoi(unsorted[i].key[dig])]++;
+    TVector <keyVal> out(unsorted.Size());
+    for (int i = 0; i <  unsorted.Size(); i++) {
+	    count[Atoi(unsorted[i].key[dig])]++;
 	}
 	for (int i = 1; i < 16; i++) {
 	    count[i] = count[i] + count[i - 1];
 	}
-	for (int i = unsorted.size() - 1; i >= 0; i--) {
-	    out[--count[atoi(unsorted[i].key[dig])]] = unsorted[i];
+	for (int i = unsorted.Size() - 1; i >= 0; i--) {
+	    out[--count[Atoi(unsorted[i].key[dig])]] = unsorted[i];
 	}
-	swap(out, unsorted);
+	Swap(out, unsorted);
 }
 
-void radixSort(TVector<keyVal>& unsorted) {
+void RadixSort(TVector<keyVal>& unsorted) {
     for (int i = MD5_LENGTH - 1; i >= 0; i--) {
-        countingSortInDig(unsorted, i);
+        CountingSortInDig(unsorted, i);
     }
 }
 
@@ -41,10 +41,10 @@ int main(void) {
 	 TVector <keyVal> entries;
 	 keyVal tmp;
 	 while(std::cin >> tmp.key >> tmp.value) {
-	    entries.push_back(tmp);
+	    entries.Push_back(tmp);
 	 }
-	 radixSort(entries);
-	 for (int i = 0; i <  entries.size(); i++) {
+	 RadixSort(entries);
+	 for (int i = 0; i <  entries.Size(); i++) {
 	    std::cout << entries[i].key << '\t' << entries[i].value << std::endl;
 	 }
 	 return 0;

@@ -6,8 +6,7 @@ class TVector {
     public:
         using value_type = T;
         using iterator = value_type*;
-        using const_iterator = const value_type*;
-
+        
         TVector(): 
             already_used_(0), storage_size_(0), storage_(nullptr)
         {
@@ -18,8 +17,9 @@ class TVector {
         {
             assert(size >= 0);
 
-            if (size == 0)
+            if (size == 0) {
                 return;
+            }
 
             already_used_ = size;
             storage_size_ = size;
@@ -28,30 +28,31 @@ class TVector {
             std::fill(storage_, storage_ + already_used_, default_value);
         }
 
-        int size() const
+        int Size() const
         {
             return already_used_;
         }
 
-        bool empty() const
+        bool Empty() const
         {
-            return size() == 0;
+            return Size() == 0;
         }
 
-        iterator begin() const
+        iterator Begin() const
         {
             return storage_;
         }
 
-        iterator end() const
+        iterator End() const
         {
-            if (storage_)
+            if (storage_) {
                 return storage_ + already_used_;
+            }
 
             return nullptr;
         }
 
-        friend void swap(TVector& lhs, TVector& rhs)
+        friend void Swap(TVector& lhs, TVector& rhs)
         {
             using std::swap;
 
@@ -62,7 +63,7 @@ class TVector {
 
         TVector& operator=(TVector other)
         {
-            swap(*this, other);
+            Swap(*this, other);
             return *this;
         }
 
@@ -72,9 +73,10 @@ class TVector {
             TVector next(other.storage_size_);
             next.already_used_ = other.already_used_;
 
-            if (other.storage_ )
+            if (other.storage_ ) {
                 std::copy(other.storage_, other.storage_ + other.storage_size_,
                         next.storage_);
+            }
 
             swap(*this, next);
         }
@@ -88,7 +90,7 @@ class TVector {
             storage_ = nullptr;
         }
 
-        void push_back(const value_type& value)
+        void Push_back(const value_type& value)
         {
             if (already_used_ < storage_size_) {
                 storage_[already_used_] = value;
@@ -97,30 +99,33 @@ class TVector {
             }
 
             int next_size = 1;
-            if (storage_size_)
+            if (storage_size_) {
                 next_size = storage_size_ * 2;
+            }
 
             TVector next(next_size);
             next.already_used_ = already_used_;
 
-            if (storage_ )
+            if (storage_ ) {
                 std::copy(storage_, storage_ + storage_size_, next.storage_);
+            }
 
-            next.push_back(value);
-            swap(*this, next);
+            next.Push_back(value);
+            Swap(*this, next);
         }
         
-        value_type& at(int index)
+        value_type& At(int index)
         {
-            if (index < 0 || index > already_used_)
+            if (index < 0 || index > already_used_) {
                 throw std::out_of_range("You are doing this wrong!");
+            }
 
             return storage_[index];
         }
 
         value_type& operator[](int index)
         {
-            return at(index);
+            return At(index);
         }
 
     private:
