@@ -99,6 +99,13 @@ class TList {
         int Size() {
             return size;
         }
+        int Find(T in) {
+            node_ptr tmp = head;
+            while(tmp != tail) {
+                if (
+                tmp = tmp->next; 
+            }
+        }
     private:
         int size;
         node_ptr head;

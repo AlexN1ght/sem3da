@@ -56,7 +56,11 @@ class TBTree {
                         return -1;
                 }
             }
-            int Plus(list_node_ptr In, node_ptr left)
+            int Plus(list_node_ptr In, node_ptr left) {
+                
+            }
+            
+            
             TList <TKeyVal<K,V>> keys;
             node_ptr prev;
     };
