@@ -1,20 +1,22 @@
 #include <iostream>
 #include <string>
-#include "List.hpp"
+#include "BTree.hpp"
 
 
 int main() {
-    TList<std::string> test;
-    std::cout << test.Insert(0, "69q") << std::endl;
-    std::cout << test.Insert(1, "2w") << std::endl;
+    TBTree<int, int, 3> test;
+    puts("Start");
+    test.add(1,4);
+    test.add(2,9);
+    test.add(-4,1);
+    test.add(0,9);
+    test.add(3,9);
     test.Print();
-    std::cout << test.Insert(3, "9e") << std::endl; 
-    std::cout << test.Insert(2, "3r") << std::endl; 
-    std::cout << test.Insert(3, "4e") << std::endl; 
-    std::cout << test.Size() << std::endl; 
+    test.add(18,9);
+    puts("LCP");
     test.Print();
-    TList<std::string> test2(test.Get(1), test.Get(4));
-    test2.Print();
-    std::cout << test2.Size() << std::endl;
+    test.add(14,-69);
+    test.Print();
+    
     return 0;
 }

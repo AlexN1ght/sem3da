@@ -4,6 +4,11 @@
 
 template<class T>
 struct TLNode {
+    TLNode(std::shared_ptr<TLNode<T>> In) {
+        value = In->value;
+        next = In->next;
+    }
+    TLNode() {}
     T value;
     std::shared_ptr<TLNode<T> > next;
 };
@@ -13,6 +18,7 @@ class TList {
     using node_ptr = std::shared_ptr<TLNode<T>>;
 
     public:
+        int size;
         TList(): size(0), head(nullptr), tail(nullptr) {}
         TList(node_ptr headIn, node_ptr tailIn) {
             assert(!(headIn == nullptr || tailIn == nullptr));
@@ -20,6 +26,15 @@ class TList {
             tail = tailIn;
             tail->next = nullptr;
             ReSize();
+        }
+        void NHead(node_ptr H) {
+            head = H;
+            //ReSize();
+        }
+        void NTail(node_ptr Ta) {
+            tail = Ta;
+            Ta->next = nullptr;
+            //ReSize();
         }
         int Insert(int n, T value) {
             if (n < 0 || n > size) {
@@ -86,11 +101,14 @@ class TList {
             return itr;
         }
         void Print() {
+            puts("Robit?");
             if (size == 0) {
                 return;
             }
             node_ptr tmp = head;
+            puts("Nuuuu");
             while(tmp != tail) {
+                puts("Ne och");
                 std::cout << tmp->value << ' ';
                 tmp = tmp->next; 
             }
@@ -102,14 +120,9 @@ class TList {
         int Find(T in) {
             node_ptr tmp = head;
             while(tmp != tail) {
-                if (
                 tmp = tmp->next; 
             }
         }
-    private:
-        int size;
-        node_ptr head;
-        node_ptr tail;
 
         void ReSize() {
             if (!head) {
@@ -123,5 +136,9 @@ class TList {
             }
             size = i;
         }
+    private:
+        
+        node_ptr head;
+        node_ptr tail;
 };
 
