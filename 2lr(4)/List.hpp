@@ -4,18 +4,18 @@
 
 template<class T>
 struct TLNode {
-    TLNode(std::shared_ptr<TLNode<T>> In) {
+    TLNode(TLNode<T>* In) {
         value = In->value;
         next = In->next;
     }
     TLNode() {}
     T value;
-    std::shared_ptr<TLNode<T> > next;
+    TLNode<T>* next;
 };
 
 template<class T>
 class TList {
-    using node_ptr = std::shared_ptr<TLNode<T>>;
+    using node_ptr = TLNode<T>*;
 
     public:
         int size;
@@ -83,7 +83,9 @@ class TList {
             for (int i = 0; i < n - 1; i++) {
                 itr = itr->next; 
             }
+            node_ptr del = itr->next;
             itr->next = itr->next->next;
+            delete del;
             if (itr->next == nullptr) {
                 tail = itr;
             }
@@ -101,18 +103,26 @@ class TList {
             return itr;
         }
         void Print() {
-            puts("Robit?");
             if (size == 0) {
                 return;
             }
             node_ptr tmp = head;
-            puts("Nuuuu");
             while(tmp != tail) {
-                puts("Ne och");
                 std::cout << tmp->value << ' ';
                 tmp = tmp->next; 
             }
             std::cout << tmp->value << '\n';
+        }
+        void Print(int t) {
+            if (size < t) {
+                return;
+            }
+            node_ptr tmp = head;
+            for (int i = 0; i < t; ++i) {
+                std::cout << tmp->value << ' ';
+                tmp = tmp->next; 
+            }
+            std::cout << '\n';
         }
         int Size() {
             return size;
@@ -136,6 +146,17 @@ class TList {
             }
             size = i;
         }
+        ~TList() {
+            node_ptr tmp = head;
+            node_ptr next;
+            while(tmp != tail) {
+                next = tmp->next; 
+                delete tmp;
+                tmp = next;
+            }
+            delete tmp;
+        }
+
     private:
         
         node_ptr head;

@@ -2,8 +2,6 @@
 #include <iostream>
 #include "List.hpp"
 
-template <class K, class V>
-class TKeyNode;
 template <class K, class V, int T>
 class TNode;
 template <class K, class V, int T>
@@ -11,14 +9,12 @@ class TBTree;
 
 template <class K, class V, int T>
 class TKeyVal {
-    using node_ptr = std::shared_ptr<TNode<K,V,T>>;
+    using node_ptr = TNode<K,V,T>*;
     public:
         TKeyVal() {
-            key = 999;
             left = nullptr;
         }
         TKeyVal(node_ptr to) {
-            key = 999;
             left = to;
         }
         TKeyVal(K keyIn, V valIn): key(keyIn), value(valIn) {
@@ -37,8 +33,8 @@ class TKeyVal {
 template <class K, class V, int T>
 class TNode {
     public:
-        using node_ptr = std::shared_ptr<TNode<K,V,T>>;
-        using list_node_ptr = std::shared_ptr<TLNode<TKeyVal<K,V,T>>>;
+        using node_ptr = TNode<K,V,T>*;
+        using list_node_ptr = TLNode<TKeyVal<K,V,T>>*;
 
         TNode(node_ptr from) {
             prev = from;
@@ -57,23 +53,14 @@ class TNode {
         int add (K& key, V& val){
             if (keys.Size() == 2 * T) {
                 if (prev == nullptr) {
-                    prev = std::make_shared<TNode<K,V,T>>(TNode<K,V,T>(nullptr, std::make_shared<TNode<K,V,T>>(*this)));
-                    prev->Print();
+                    prev = new TNode<K,V,T>(nullptr, this);
                 }
-                list_node_ptr mid = std::make_shared<TLNode<TKeyVal<K,V,T>>>(TLNode<TKeyVal<K,V,T>>(keys.Get(T-1)));
-                std::cout << mid->next << '\n';
-                node_ptr left = std::make_shared<TNode<K,V,T>>(TNode<K,V,T>(keys.Get(0), keys.Get(T-1), prev));
-                std::cout << mid->next << '\n';
+                list_node_ptr mid = new TLNode<TKeyVal<K,V,T>>(keys.Get(T-1));
+                node_ptr left = new TNode<K,V,T>(keys.Get(0), keys.Get(T-1), prev);
                 keys.NHead(mid->next);
-                std::cout << mid->next << '\n';
                 keys.ReSize();
                 mid->value.left = left;
-                puts("JGKLJGLKJGLKGLKJGKJG");
-                this->Print();
-                prev->Print();
                 prev->Plus(mid);
-                prev->Print();
-                keys.ReSize();
                 if (key < mid->value.key)
                     return left->add(key, val);
                 if (key > mid->value.key)
@@ -112,9 +99,8 @@ class TNode {
                 keys.Insert(0, In->value);
                 return 1;
             }
-            puts("Ter sdes");
             for (int i = 0; i < (s - 2) ; ++i) {
-                if (tmp->next->value.key > In->value.key || tmp->next->value.key == (int)NULL) {
+                if (tmp->next->value.key > In->value.key) {
                     In->next = tmp->next;
                     tmp->next = In;
                     ++(keys.size);
@@ -128,15 +114,12 @@ class TNode {
             return 1;
         }
         void Print() {
-            keys.Print();
             int s = keys.Size();
+            keys.Print(s - 1);
             list_node_ptr tmp = keys.Get(0);
-            puts("AAAAA");
             for (int i = 0; i < s ; ++i) {
                 if (tmp->value.left) {
-                    puts("I sho?");
-                    std::cout << tmp->value;
-                    tmp->value.left->keys.Print();
+                    tmp->value.left->keys.Print(tmp->value.left->keys.Size() - 1);
                 }
                 tmp = tmp->next;
             }
@@ -148,17 +131,16 @@ class TNode {
 
 template <class K, class V, int T>
 class TBTree {
-    using node_ptr = std::shared_ptr<TNode<K,V,T>>;
-    using list_node_ptr = std::shared_ptr<TLNode<TKeyVal<K,V,T>>>;
+    using node_ptr = TNode<K,V,T>*;
+    using list_node_ptr = TLNode<TKeyVal<K,V,T>>*;
     public:
         node_ptr root;
         TBTree() {
-            root = std::make_shared<TNode<K,V,T>>(TNode<K,V,T>(nullptr));
+            root = new TNode<K,V,T>(nullptr);
         }
         int add(K key, V val) {
             if (root->add(key, val)) {
                 while (root->prev != nullptr) {
-                    puts("rerererebe");
                     root = root->prev;
                 }
                 return 1;
