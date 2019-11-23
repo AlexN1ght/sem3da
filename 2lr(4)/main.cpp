@@ -4,7 +4,7 @@
 
 
 int main() {
-    TBTree<std::string, int, 3> test;
+    TBTree<std::string, int, 2> test;
     test.add("1",4);
     test.add("2",9);
     test.add("3",1);
@@ -32,9 +32,9 @@ int main() {
     test.add("333",-69);
     puts("");
     test.Print();
-    test.del("1");
-    test.Print();
     test.del("2");
+    test.Print();
+    test.del("1");
     test.Print();
     
     return 0;

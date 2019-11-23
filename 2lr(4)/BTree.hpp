@@ -65,7 +65,23 @@ TLNode<TKeyVal<K,V,T>>* findPrevKey(TList <TKeyVal<K,V,T>>& keys, K& key) {
 }
 
 template <class K, class V, int T>
+void RePrev(TList <TKeyVal<K,V,T>>& keys, TNode<K,V,T>* prev) {
+    if (keys.head->value.left == nullptr) {
+        return;
+    }
+    TLNode<TKeyVal<K,V,T>>* tmp = keys.head;
+    while(tmp != keys.tail) {
+        tmp->value.left->prev = prev;
+        tmp = tmp->next; 
+    }
+    tmp->value.left->prev = prev;
+}
+
+template <class K, class V, int T>
 void JoinKeys(TList <TKeyVal<K,V,T>>& to, TList <TKeyVal<K,V,T>>& from, TKeyVal<K,V,T>& mid) {
+    if (to.Get(0)->value.left) {
+        RePrev(from, to.Get(0)->value.left->prev);
+    }
     if (to.Get(0)->value.key < from.Get(0)->value.key) {
         to.Last()->value.key = mid.key;
         to.Last()->value.value = mid.value;
@@ -112,12 +128,15 @@ class TNode {
                 keys.ReSize();
                 mid->value.left = left;
                 prev->Plus(mid);
-                if (key < mid->value.key)
+                RePrev(left->keys, left);
+                if (key < mid->value.key) {
                     return left->add(key, val);
-                if (key > mid->value.key)
+                }
+                if (key > mid->value.key) {
                     return this->add(key, val);
-                else
+                } else {
                     return 0;
+                }
             }
             list_node_ptr tmp = keys.Get(0);
             int s = keys.Size();
@@ -125,8 +144,7 @@ class TNode {
                 if (tmp->value.key > key) {
                     if (tmp->value.left) {
                         return tmp->value.left->add(key, val);
-                    }
-                    else {
+                    } else {
                         keys.Insert(i, TKeyVal<K,V,T>(key, val));
                         return 1;
                     }
@@ -137,8 +155,7 @@ class TNode {
             }
             if (tmp->value.left) {
                 return tmp->value.left->add(key, val);
-            }
-            else {
+            } else {
                 keys.Insert(s - 1, TKeyVal<K,V,T>(key, val));                
                 return 1;
             }
@@ -173,6 +190,10 @@ class TNode {
                 return 0;
             }
             list_node_ptr right = tmp->next->value.left->keys.Get(0);
+            if(right->value.left) {
+                right->value.left->prev = tmp->value.left;
+            }
+
             tmp->value.left->keys.Last()->value.key = tmp->value.key;
             tmp->value.left->keys.Last()->value.value = tmp->value.value;
             tmp->value.left->keys.PushBack(TKeyVal<K,V,T>(right->value.left));
@@ -194,6 +215,9 @@ class TNode {
             }
             list_node_ptr mid = tmp->next;
             int s = tmp->value.left->keys.Size();
+            if(tmp->value.left->keys.Get(s - 1)->value.left) {
+                tmp->value.left->keys.Get(s - 1)->value.left->prev = mid->value.left;
+            }
             mid->value.left->keys.Insert(0, TKeyVal<K,V,T>(tmp->value.key, 
                                                            tmp->value.value,
                                                            tmp->value.left->keys.Get(s - 1)->value.left));

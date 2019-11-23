@@ -193,8 +193,6 @@ class TList {
             }
             delete tmp;
         }
-
-    private:
         
         node_ptr head;
         node_ptr tail;
