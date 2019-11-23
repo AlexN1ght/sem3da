@@ -41,9 +41,6 @@ TLNode<TKeyVal<K,V,T>>* findKey(TList <TKeyVal<K,V,T>>& keys, K& key) {
         if (tmp->value.key >= key) {
             return tmp;
         } 
-        //else if (tmp->value.key == key) {
-        //    return nullptr;
-        //}
         tmp = tmp->next;
     }
     return tmp;
@@ -95,6 +92,9 @@ void JoinKeys(TList <TKeyVal<K,V,T>>& to, TList <TKeyVal<K,V,T>>& from, TKeyVal<
         to.NHead(from.Get(0));
         to.ReSize();
     }
+    from.NHead(nullptr);
+    from.NTail(nullptr);
+    from.ReSize();
 }
 
 template <class K, class V, int T>
@@ -235,7 +235,7 @@ class TNode {
                 return 0;
             }
             JoinKeys(tmp->value.left->keys, tmp->next->value.left->keys, tmp->value);
-            tmp->next->value.left->Free();
+            delete tmp->next->value.left;
             tmp->next->value.left = tmp->value.left;
             keys.Delete(tmp);
             return 1;
@@ -246,7 +246,7 @@ class TNode {
                 return 0;
             }
             JoinKeys(tmp->next->value.left->keys, tmp->value.left->keys, tmp->value);
-            tmp->value.left->Free();
+            delete tmp->value.left;
             keys.Delete(tmp);
             return 1;
         }
@@ -317,7 +317,22 @@ class TNode {
         void Free() {
 
         }
-
+       
+        ~TNode() {
+            list_node_ptr tmp = keys.head;
+            if (!tmp) {
+                return;
+            }
+            if (tmp->value.left) {
+                while (tmp != keys.tail) {
+                    delete tmp->value.left;
+                    tmp = tmp->next;
+                }
+                delete tmp->value.left;
+            }
+            
+        }
+        
 
         TList <TKeyVal<K,V,T>> keys;
         node_ptr prev;
@@ -346,6 +361,10 @@ class TBTree {
         }
         void Print() {
             root->Print(0);
+        }
+        
+        ~TBTree() {
+            delete root;
         }
     private:
         //node_ptr root;
