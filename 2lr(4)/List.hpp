@@ -33,7 +33,9 @@ class TList {
         }
         void NTail(node_ptr Ta) {
             tail = Ta;
-            Ta->next = nullptr;
+            if (Ta) {
+                Ta->next = nullptr;
+            }
             //ReSize();
         }
         int PushBack(T value) {
@@ -164,12 +166,14 @@ class TList {
         node_ptr Last() {
             return tail;
         }
+        /*
         int Find(T in) {
             node_ptr tmp = head;
             while(tmp != tail) {
                 tmp = tmp->next; 
             }
         }
+        */
 
         void ReSize() {
             if (!head) {
@@ -184,6 +188,9 @@ class TList {
             size = i;
         }
         ~TList() {
+            if (!head) {
+                return;
+            }
             node_ptr tmp = head;
             node_ptr next;
             while(tmp != tail) {
