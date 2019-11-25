@@ -330,7 +330,7 @@ class TNode {
                 }
                 delete tmp->value.left;
             }
-            
+
         }
         
 
