@@ -55,7 +55,7 @@ class TList {
                 return -1;
             }
             if (n == 0) {
-                node_ptr newEl{new TLNode<T>};
+                node_ptr newEl = new TLNode<T>;
                 newEl->value = value;
                 newEl->next = head;
                 head = newEl;
@@ -70,7 +70,7 @@ class TList {
             for (int i = 0; i < n - 1; i++) {
                 tmp = tmp->next; 
             }
-            node_ptr newEl{new TLNode<T>};
+            node_ptr newEl = new TLNode<T>;
             newEl->value = value;
             newEl->next = tmp->next;
             tmp->next = newEl;
@@ -85,8 +85,10 @@ class TList {
                 return -1;
             }
             if (n == 0) {
+                node_ptr del = head;
                 head = head->next;
                 size--;
+                delete del;
                 if (!head) {
                     tail = head;
                 }
@@ -113,6 +115,7 @@ class TList {
                 if (!head) {
                     tail = head;
                 }
+                delete n;
                 return 1;
             }
                 

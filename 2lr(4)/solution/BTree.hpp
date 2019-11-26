@@ -23,6 +23,12 @@ class TKeyVal {
         TKeyVal(K keyIn, V valIn, node_ptr to): key(keyIn), value(valIn) {
             left = to;
         }
+        TKeyVal(const TKeyVal<K,V,T>& in) {
+            std::cout << "fffff\n"; 
+            key = in.key;
+            value = in.value;
+            left = in.left;
+        }
 
         friend std::ostream& operator<< (std::ostream &out, const TKeyVal<K,V,T> &kv) {
             out << kv.key << " :: " << kv.value << " ";
@@ -160,26 +166,27 @@ class TNode {
                 return 1;
             }
         }
-        int Plus(list_node_ptr In) {
+        void Plus(list_node_ptr In) {
             list_node_ptr tmp = keys.Get(0);
             int s = keys.Size();
-            if (tmp->value.key > In->value.key || s == 1) {
-                keys.Insert(0, In->value);
-                return 1;
+            if (s == 1) {
+                In->next = tmp;
+                keys.NHead(In);
+                ++(keys.size);
+                return;
             }
             for (int i = 0; i < (s - 2) ; ++i) {
                 if (tmp->next->value.key > In->value.key) {
                     In->next = tmp->next;
                     tmp->next = In;
                     ++(keys.size);
-                    return 1;
+                    return;
                 }
                 tmp = tmp->next;
             }
             In->next = tmp->next;
             tmp->next = In;
             ++(keys.size);
-            return 1;
         }
         int addFRBrother(K to) {
             list_node_ptr tmp = findKey(keys, to);
@@ -299,6 +306,19 @@ class TNode {
             }
         }
         
+        V Find(K in) {
+            list_node_ptr tmp = findKey(keys, in);
+            if (!tmp) {
+                throw -1;
+            }
+            if (tmp->value.key == in && tmp->next) {
+                return tmp->value.value;
+            } else if (tmp->value.left) {
+                return tmp->value.left->Find(in);
+            }
+            throw -1;
+        }
+
         void Print(int level) {
             int s = keys.Size();
             for (int k = 0 ; k < level; k++) {
@@ -314,10 +334,6 @@ class TNode {
             }
         }
         
-        void Free() {
-
-        }
-       
         ~TNode() {
             list_node_ptr tmp = keys.head;
             if (!tmp) {
@@ -330,7 +346,6 @@ class TNode {
                 }
                 delete tmp->value.left;
             }
-
         }
         
 
@@ -361,6 +376,9 @@ class TBTree {
         }
         void Print() {
             root->Print(0);
+        }
+        V Find(K in) {
+            return root->Find(in);
         }
         
         ~TBTree() {
