@@ -14,13 +14,13 @@ class TKeyVal {
         TKeyVal() {
             left = nullptr;
         }
-        TKeyVal(node_ptr to) {
+        TKeyVal(node_ptr& to) {
             left = to;
         }
-        TKeyVal(K keyIn, V valIn): key(keyIn), value(valIn) {
+        TKeyVal(K& keyIn, V& valIn): key(keyIn), value(valIn) {
             left = nullptr;
         }
-        TKeyVal(K keyIn, V valIn, node_ptr to): key(keyIn), value(valIn) {
+        TKeyVal(K& keyIn, V& valIn, node_ptr& to): key(keyIn), value(valIn) {
             left = to;
         }
         TKeyVal(const TKeyVal<K,V,T>& in) {
@@ -169,13 +169,13 @@ class TNode {
         void Plus(list_node_ptr In) {
             list_node_ptr tmp = keys.Get(0);
             int s = keys.Size();
-            if (s == 1) {
+            if (tmp->value.key > In->value.key || s == 1) {
                 In->next = tmp;
                 keys.NHead(In);
                 ++(keys.size);
                 return;
             }
-            for (int i = 0; i < (s - 2) ; ++i) {
+            for (int i = 0; i < (s - 2); ++i) {
                 if (tmp->next->value.key > In->value.key) {
                     In->next = tmp->next;
                     tmp->next = In;
@@ -188,12 +188,12 @@ class TNode {
             tmp->next = In;
             ++(keys.size);
         }
-        int addFRBrother(K to) {
+        int addFRBrother(K& to) {
             list_node_ptr tmp = findKey(keys, to);
             if (tmp->next == nullptr) {
                 return 0;
             }
-            if (tmp->next->value.left->keys.Size() - 1 == T - 1 ) {
+            if (tmp->next->value.left->keys.Size() - 1 <= T - 1 ) {
                 return 0;
             }
             list_node_ptr right = tmp->next->value.left->keys.Get(0);
@@ -212,12 +212,12 @@ class TNode {
             return 1;
         }
 
-        int addFLBrother(K to) {
+        int addFLBrother(K& to) {
             list_node_ptr tmp = findPrevKey(keys, to);
             if (tmp == nullptr) {
                 return 0;
             }
-            if (tmp->value.left->keys.Size() - 1 == T - 1 ) {
+            if (tmp->value.left->keys.Size() - 1 <= T - 1 ) {
                 return 0;
             }
             list_node_ptr mid = tmp->next;
@@ -236,7 +236,7 @@ class TNode {
             return 1;
         }
 
-        int JoinR(K to) {
+        int JoinR(K& to) {
             list_node_ptr tmp = findKey(keys, to);
             if (tmp->next == nullptr) {
                 return 0;
@@ -247,7 +247,7 @@ class TNode {
             keys.Delete(tmp);
             return 1;
         }
-        int JoinL(K to) {
+        int JoinL(K& to) {
             list_node_ptr tmp = findPrevKey(keys, to);
             if (tmp == nullptr) {
                 return 0;
@@ -277,13 +277,13 @@ class TNode {
             return 0;
         } 
 
-        int del(K d) {
+        int del(K& d) {
             if (keys.Size() - 1 == T - 1) {
                 AddExt();
             }
             list_node_ptr tmp = findKey(keys, d);
-            if (tmp->value.key == d) {
-                if (tmp->value.left == nullptr) {
+            if (tmp->value.key == d && tmp->next) {
+                if (!tmp->value.left) {
                     keys.Delete(tmp);
                     return 1;
                 } else {
@@ -306,7 +306,7 @@ class TNode {
             }
         }
         
-        V Find(K in) {
+        V Find(K& in) {
             list_node_ptr tmp = findKey(keys, in);
             if (!tmp) {
                 throw -1;
@@ -362,7 +362,7 @@ class TBTree {
         TBTree() {
             root = new TNode<K,V,T>(nullptr);
         }
-        int add(K key, V val) {
+        int add(K& key, V& val) {
             if (root->add(key, val)) {
                 while (root->prev != nullptr) {
                     root = root->prev;
@@ -371,13 +371,23 @@ class TBTree {
             }
             return 0;
         }
-        int del(K key) {
-            return root->del(key);
+        int del(K& key) {
+            if (root->del(key)) {
+                if (root->keys.Size() == 1) {
+                    node_ptr tmp = root->keys.head->value.left;
+                    root->keys.head->value.left = nullptr;
+                    delete root;
+                    root = tmp;
+                    root->prev = nullptr;
+                }
+                return 1;
+            }
+            return 0;
         }
         void Print() {
             root->Print(0);
         }
-        V Find(K in) {
+        V Find(K& in) {
             return root->Find(in);
         }
         

@@ -8,7 +8,9 @@ struct TLNode {
         value = In->value;
         next = In->next;
     }
-    TLNode() {}
+    TLNode() {
+        next = nullptr;
+    }
     T value;
     TLNode<T>* next;
 };
@@ -97,14 +99,14 @@ class TList {
                 
             node_ptr itr = head;
             for (int i = 0; i < n - 1; i++) {
-                itr = itr->next; 
+                itr = itr->next;
             }
             node_ptr del = itr->next;
             itr->next = itr->next->next;
-            delete del;
-            if (itr->next == nullptr) {
+            if (!itr->next) {
                 tail = itr;
             }
+            delete del;
             size--;
             return 1;
         }
@@ -190,6 +192,7 @@ class TList {
             }
             size = i;
         }
+
         ~TList() {
             if (!head) {
                 return;

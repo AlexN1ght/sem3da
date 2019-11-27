@@ -25,7 +25,7 @@ class TString {
         TString(const TString& In): size(In.size){
             //puts("Test1");
             stor = new char[size];
-            std::copy(In.stor, In.stor + size - 1, stor);
+            std::copy(In.stor, In.stor + size, stor);
             //puts("Test2");
         }
 
@@ -34,17 +34,18 @@ class TString {
             //puts("Test");
             delete[] stor;
             stor = new char[size];
-            std::copy(In.stor, In.stor + size - 1, stor);
+            std::copy(In.stor, In.stor + size, stor);
             return *this;
         }
 
         friend std::ostream& operator<< (std::ostream &out, const TString& stO) {
-            out << stO.stor;
+            for (int i = 0; stO.stor[i] != '\0'; i++) {
+                out << stO.stor[i];
+            }
             return out;
         }
 
         friend std::istream& operator>> (std::istream &is, TString& stI)  {
-            int new_size = 0;
             is.sync();
             TVector<char> temp;
             while(is_space((char)is.peek())) {
@@ -54,14 +55,12 @@ class TString {
             }
             while(!is_space((char)is.peek())) {
                 temp.Push_back(to_lo(is.get()));
-                new_size++;
             }
-            temp.Push_back('\0'); 
-            new_size++;
+            temp.Push_back('\0');
             delete[] stI.stor;
-            stI.size = new_size; 
+            stI.size = temp.Size(); 
             stI.stor = new char[stI.size];
-            std::copy(temp.Begin(), temp.Begin() + stI.size - 1, stI.stor);
+            std::copy(temp.Begin(), temp.End(), stI.stor);
             return is;
         }
 
@@ -160,16 +159,10 @@ class TString {
 };
 
 int main() {
-    TBTree<TString, unsigned long long, 2> tree;
-    TString command;
-    //TString eee;
-    //std::cin >> command;
-    //eee = command;
-    //std::cout << command << "\n";
-    //std::cout << command[0];
-    //std::cout << command << "\n";
-    //return 0;
-    TString key;
+    using String = TString;
+    TBTree<String, unsigned long long, 3> tree;
+    String command;
+    String key;
     unsigned long long val;
 
     while(std::cin >> command) {
