@@ -5,6 +5,8 @@
 #include "Vector.hpp"
 #include "BTree.hpp"
 
+
+
 bool is_space(char c) {
     return (c == '\n' || c == ' ' || c == '\t' || c == EOF) ? true : false;
 }
@@ -19,14 +21,35 @@ char to_lo(char c) {
 class TString {
     public:
         TString(){
+            //stor = new char[257];
+            cons++;
             std::fill(stor, stor + 257, '\0');
         }
-        TString(const TString& In){
-            std::copy(In.stor, In.stor + 257, stor);
+        TString(const char* In){
+            //stor = new char[257];
+            std::copy(In, In + 257, stor);
         }
-
-        TString operator= (const TString& In) {
+        TString(const TString& In) : TString(In.stor){
+            //stor = new char[257];
+            cop++;
+            //std::copy(In.stor, In.stor + 257, stor);
+        }
+        TString(TString&& In) noexcept {
+            //cop++;
+            std::swap(In.stor, stor);
+            //In.stor = nullptr;
+        }
+        TString& operator= (const TString& In) {
+            cop++;
             std::copy(In.stor, In.stor + 257, stor);
+            return *this;
+        }
+        TString& operator= (TString&& In) noexcept{
+            //cop++;
+            //if (stor) {
+                //delete[] stor;
+            //}
+            std::swap(In.stor, stor);
             return *this;
         }
 
@@ -161,7 +184,9 @@ class TString {
             return stor;
         }
         ~TString() {
-            //delete[] stor;
+            //if (stor) {
+            //    delete[] stor;
+            //}
         }
 
     private:
@@ -170,6 +195,8 @@ class TString {
 };
 
 int main() {
+    cons = 0;
+    cop = 0;
     std::ios::sync_with_stdio(false);
     using String = TString;
     TBTree<String, unsigned long long, 10> tree;
@@ -229,6 +256,7 @@ int main() {
                 puts("NoSuchWord");
             }
         }
+        //printf("%d %d\n", cons, cop);
     }
     return 0;
 }

@@ -2,6 +2,7 @@
 #include <iostream>
 #include "List.hpp"
 
+
 template <class K, class V, int T>
 class TNode;
 template <class K, class V, int T>
@@ -28,6 +29,21 @@ class TKeyVal {
             value = in.value;
             left = in.left;
         }
+        TKeyVal(TKeyVal<K,V,T>&& in) : key(std::move(in.key)), value(in.value), left(in.left) {}
+        
+        TKeyVal<K,V,T>& operator= (const TKeyVal<K,V,T>& in) {
+            key = in.key;
+            value = in.value;
+            left = in.left;
+            return *this;
+        }
+        TKeyVal<K,V,T>& operator= (TKeyVal<K,V,T>&& in) noexcept{
+            key = std::move(in.key);
+            value = in.value;
+            left = in.left;
+            return *this;
+        }
+
 
         friend std::ostream& operator<< (std::ostream &out, const TKeyVal<K,V,T> &kv) {
             out << kv.key << " :: " << kv.value << " ";
@@ -89,17 +105,19 @@ void JoinKeys(TList <TKeyVal<K,V,T>>& to, TList <TKeyVal<K,V,T>>& from, TKeyVal<
         to.Last()->value.value = mid.value;
         to.Last()->next = from.Get(0);
         to.NTail(from.Last());
-        to.ReSize();
+        //to.ReSize();
+        to.size += from.size;
     } else {
         from.Last()->value.key = mid.key;
         from.Last()->value.value = mid.value;
         from.Last()->next = to.Get(0);
         to.NHead(from.Get(0));
-        to.ReSize();
+        to.size += from.size;
     }
     from.NHead(nullptr);
     from.NTail(nullptr);
-    from.ReSize();
+    //from.ReSize();
+    from.size = 0;
 }
 
 template <class K, class V, int T>
@@ -123,17 +141,20 @@ class TNode {
             prev = from;
             keys.NHead(st);
             keys.NTail(en);
-            keys.ReSize();
+            //keys.ReSize();
+            keys.size = T;
         }
         int add (K& key, V& val){
             if (keys.Size() == 2 * T) {
                 if (prev == nullptr) {
                     prev = new TNode<K,V,T>(nullptr, this);
                 }
-                list_node_ptr mid = new TLNode<TKeyVal<K,V,T>>(keys.Get(T-1));
-                node_ptr left = new TNode<K,V,T>(keys.Get(0), keys.Get(T-1), prev);
+                list_node_ptr tmpM = keys.Get(T-1);
+                list_node_ptr mid = new TLNode<TKeyVal<K,V,T>>(tmpM);
+                node_ptr left = new TNode<K,V,T>(keys.Get(0), tmpM, prev);
                 keys.NHead(mid->next);
-                keys.ReSize();
+                //keys.ReSize();
+                keys.size = T;
                 mid->value.left = left;
                 prev->Plus(mid);
                 RePrev(left->keys, left);
@@ -224,15 +245,16 @@ class TNode {
             }
             list_node_ptr mid = tmp->next;
             int s = tmp->value.left->keys.Size();
-            if(tmp->value.left->keys.Get(s - 1)->value.left) {
-                tmp->value.left->keys.Get(s - 1)->value.left->prev = mid->value.left;
+            list_node_ptr tmpN = tmp->value.left->keys.Get(s - 2);
+            if(tmpN->next->value.left) {
+                tmpN->next->value.left->prev = mid->value.left;
             }
             mid->value.left->keys.Insert(0, TKeyVal<K,V,T>(tmp->value.key, 
                                                            tmp->value.value,
-                                                           tmp->value.left->keys.Get(s - 1)->value.left));
+                                                           tmpN->next->value.left));
 
-            tmp->value.value = tmp->value.left->keys.Get(s - 2)->value.value;
-            tmp->value.key = tmp->value.left->keys.Get(s - 2)->value.key;
+            tmp->value.value = tmpN->value.value;
+            tmp->value.key = tmpN->value.key;
 
             tmp->value.left->keys.Delete(s - 1);
             return 1;

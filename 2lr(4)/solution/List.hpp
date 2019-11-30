@@ -1,12 +1,20 @@
 #include <iostream>
 #include <cassert>
 
+int cons;
+int cop;
 
 template<class T>
 struct TLNode {
     TLNode(TLNode<T>* In) {
         value = In->value;
         next = In->next;
+    }
+    TLNode(T& In) : value(In) {
+        next = nullptr;
+    }
+    TLNode(T&& In) : value(std::move(value)) {
+        next = nullptr;
     }
     TLNode() {
         next = nullptr;
@@ -40,9 +48,8 @@ class TList {
             }
             //ReSize();
         }
-        int PushBack(T value) {
-            node_ptr newEl{new TLNode<T>};
-            newEl->value = value;
+        int PushBack(T& value) {
+            node_ptr newEl = new TLNode<T>(value);
             if (tail) {
                 tail->next = newEl;
             } else {
@@ -52,13 +59,24 @@ class TList {
             ++size;
             return 1;
         }
-        int Insert(int n, T value) {
+        int PushBack(T&& value) {
+            node_ptr newEl = new TLNode<T>(std::move(value));
+            newEl->value = std::move(value);
+            if (tail) {
+                tail->next = newEl;
+            } else {
+                head = newEl;
+            }
+            tail = newEl;
+            ++size;
+            return 1;
+        }
+        int Insert(int n, T& value) {
             if (n < 0 || n > size) {
                 return -1;
             }
             if (n == 0) {
-                node_ptr newEl = new TLNode<T>;
-                newEl->value = value;
+                node_ptr newEl = new TLNode<T>(value);
                 newEl->next = head;
                 head = newEl;
                 size++;
@@ -72,8 +90,35 @@ class TList {
             for (int i = 0; i < n - 1; i++) {
                 tmp = tmp->next; 
             }
-            node_ptr newEl = new TLNode<T>;
-            newEl->value = value;
+            node_ptr newEl = new TLNode<T>(value);
+            newEl->next = tmp->next;
+            tmp->next = newEl;
+            if (newEl->next == nullptr) {
+                tail = newEl;
+            }
+            size++;
+            return 1;
+        }
+        int Insert(int n, T&& value) {
+            if (n < 0 || n > size) {
+                return -1;
+            }
+            if (n == 0) {
+                node_ptr newEl = new TLNode<T>(std::move(value));
+                newEl->next = head;
+                head = newEl;
+                size++;
+                if (tail == nullptr) {
+                    tail = newEl;
+                }
+                return 1;
+            }
+                
+            node_ptr tmp = head;
+            for (int i = 0; i < n - 1; i++) {
+                tmp = tmp->next; 
+            }
+            node_ptr newEl = new TLNode<T>(std::move(value));
             newEl->next = tmp->next;
             tmp->next = newEl;
             if (newEl->next == nullptr) {
