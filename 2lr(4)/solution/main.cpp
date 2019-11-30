@@ -29,10 +29,10 @@ class TString {
             //stor = new char[257];
             std::copy(In, In + 257, stor);
         }
-        TString(const TString& In) : TString(In.stor){
+        TString(const TString& In) : {
             //stor = new char[257];
             cop++;
-            //std::copy(In.stor, In.stor + 257, stor);
+            std::copy(In.stor, In.stor + 257, stor);
         }
         TString(TString&& In) noexcept {
             //cop++;
