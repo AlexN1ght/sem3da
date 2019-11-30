@@ -14,7 +14,7 @@ class TKeyVal {
         TKeyVal() {
             left = nullptr;
         }
-        TKeyVal(node_ptr& to) {
+        TKeyVal(node_ptr to) {
             left = to;
         }
         TKeyVal(K& keyIn, V& valIn): key(keyIn), value(valIn) {
@@ -24,7 +24,6 @@ class TKeyVal {
             left = to;
         }
         TKeyVal(const TKeyVal<K,V,T>& in) {
-            std::cout << "fffff\n"; 
             key = in.key;
             value = in.value;
             left = in.left;
@@ -43,7 +42,7 @@ template <class K, class V, int T>
 TLNode<TKeyVal<K,V,T>>* findKey(TList <TKeyVal<K,V,T>>& keys, K& key) {
     TLNode<TKeyVal<K,V,T>>* tmp = keys.Get(0);
     int s = keys.Size();
-    for (int i = 0; i < (s - 1) ; ++i) {
+    for (int i = 0; i < (s - 1); ++i) {
         if (tmp->value.key >= key) {
             return tmp;
         } 
@@ -109,6 +108,9 @@ class TNode {
         using node_ptr = TNode<K,V,T>*;
         using list_node_ptr = TLNode<TKeyVal<K,V,T>>*;
 
+        TNode() {
+            prev = nullptr;
+        }
         TNode(node_ptr from) {
             prev = from;
             keys.Insert(0, TKeyVal<K,V,T>());
@@ -267,7 +269,7 @@ class TNode {
             } else if (prev->addFLBrother(keys.Get(0)->value.key)) {
                 return 1;
             } else if (prev->keys.Size() - 1 == T - 1) {
-                prev->AddExt();
+                //prev->AddExt();
             }
             if (prev->JoinR(keys.Get(0)->value.key)) {
                 return 1;
@@ -333,6 +335,55 @@ class TNode {
                 tmp = tmp->next;
             }
         }
+
+        int Save(FILE* stor) {
+            int s = keys.Size();
+            fwrite(&s, sizeof(int), 1, stor);
+
+            list_node_ptr tmp = keys.Get(0);
+            for (int i = 0; i < (s - 1) ; ++i) {
+                fwrite(tmp->value.key.CStr(), 257, 1, stor);
+                fwrite(&tmp->value.value, sizeof(V), 1, stor);
+                tmp = tmp->next;
+            }
+
+            int end = ((keys.Get(0)->value.left) ? 0 : 1);
+            fwrite(&end, sizeof(int), 1, stor);
+            tmp = keys.Get(0);
+            if (!end) {
+                for (int i = 0; i < s ; ++i) {
+                    tmp->value.left->Save(stor);
+                    tmp = tmp->next;
+                }
+            }
+            return 1;
+        }
+        
+        int Load(FILE* stor) {
+            int s;
+            fread(&s, sizeof(int), 1, stor);
+            K key;
+            V val;
+            for (int i = 0; i < (s - 1) ; ++i) {
+                fread(key.CStr(), 257, 1, stor);
+                fread(&val, sizeof(V), 1, stor);
+                keys.PushBack(TKeyVal<K,V,T>(key, val));
+            }
+            keys.PushBack(TKeyVal<K,V,T>(nullptr));
+
+            int end;
+            fread(&end, sizeof(int), 1, stor);
+            list_node_ptr tmp = keys.Get(0);
+            if (!end) {
+                for (int i = 0; i < s ; ++i) {
+                    tmp->value.left = new TNode<K,V,T>();
+                    tmp->value.left->Load(stor);
+                    tmp->value.left->prev = this;
+                    tmp = tmp->next;
+                }
+            }
+            return 1;
+        }
         
         ~TNode() {
             list_node_ptr tmp = keys.head;
@@ -369,12 +420,18 @@ class TBTree {
                 }
                 return 1;
             }
+            while (root->prev != nullptr) {
+                root = root->prev;
+            }
             return 0;
         }
         int del(K& key) {
             if (root->del(key)) {
                 if (root->keys.Size() == 1) {
                     node_ptr tmp = root->keys.head->value.left;
+                    if (!tmp) {
+                        return 1;
+                    }
                     root->keys.head->value.left = nullptr;
                     delete root;
                     root = tmp;
@@ -389,6 +446,26 @@ class TBTree {
         }
         V Find(K& in) {
             return root->Find(in);
+        }
+        int Save(char* path) {
+            FILE* stor = fopen(path, "wb");
+            if (!stor) {
+                return 0;
+            }
+            root->Save(stor);
+            fclose(stor);
+            return 1;
+        }
+        int Load(char* path) {
+            FILE* stor = fopen(path, "rb");
+            if (!stor) {
+                return 0;
+            }
+            delete root;
+            root = new TNode<K,V,T>();
+            root->Load(stor);
+            fclose(stor);
+            return 1;
         }
         
         ~TBTree() {

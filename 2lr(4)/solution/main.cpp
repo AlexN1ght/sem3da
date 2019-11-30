@@ -18,34 +18,25 @@ char to_lo(char c) {
 
 class TString {
     public:
-        TString(): size(1){
-            stor = new char[size];
-            stor[0] = '\0';
+        TString(){
+            std::fill(stor, stor + 257, '\0');
         }
-        TString(const TString& In): size(In.size){
-            //puts("Test1");
-            stor = new char[size];
-            std::copy(In.stor, In.stor + size, stor);
-            //puts("Test2");
+        TString(const TString& In){
+            std::copy(In.stor, In.stor + 257, stor);
         }
 
         TString operator= (const TString& In) {
-            size = In.size;
-            //puts("Test");
-            delete[] stor;
-            stor = new char[size];
-            std::copy(In.stor, In.stor + size, stor);
+            std::copy(In.stor, In.stor + 257, stor);
             return *this;
         }
 
         friend std::ostream& operator<< (std::ostream &out, const TString& stO) {
-            for (int i = 0; stO.stor[i] != '\0'; i++) {
-                out << stO.stor[i];
-            }
+            out << stO.stor;
             return out;
         }
 
         friend std::istream& operator>> (std::istream &is, TString& stI)  {
+            /*
             is.sync();
             TVector<char> temp;
             while(is_space((char)is.peek())) {
@@ -61,11 +52,25 @@ class TString {
             stI.size = temp.Size(); 
             stI.stor = new char[stI.size];
             std::copy(temp.Begin(), temp.End(), stI.stor);
+            */
+            is.sync();
+            int i = 0;
+            while(is_space((char)is.peek())) {
+                if(is.get() == EOF) {
+                    return is;
+                }
+            }
+            while(!is_space((char)is.peek())) {
+                stI.stor[i] = (char)to_lo(is.get());
+                i++;
+            }
+            stI.stor[i] = '\0';
             return is;
         }
 
         bool operator < (const TString& In) {
-            for (int i = 0; (i < size - 1) && (i < In.size - 1); ++i) {
+            int i = 0;
+            for (; stor[i] != '\0' && In.stor[i] != '\0'; ++i) {
                 if (stor[i] != In.stor[i]) {
                     if (stor[i] < In.stor[i]) {
                         return true;
@@ -74,7 +79,7 @@ class TString {
                     }
                 }
             }
-            if (size < In.size) {
+            if ((stor[i] == '\0') && (In.stor[i] != '\0')){
                 return true;
             } else {
                 return false;
@@ -82,7 +87,8 @@ class TString {
         }
 
         bool operator <= (const TString& In) {
-            for (int i = 0; (i < size - 1) && (i < In.size - 1); ++i) {
+            int i = 0;
+            for (; stor[i] != '\0' && In.stor[i] != '\0'; ++i) {
                 if (stor[i] != In.stor[i]) {
                     if (stor[i] <= In.stor[i]) {
                         return true;
@@ -91,7 +97,7 @@ class TString {
                     }
                 }
             }
-            if (size <= In.size) {
+            if ((stor[i] == '\0' && In.stor[i] == '\0') || (stor[i] == '\0' && In.stor[i] != '\0')) {
                 return true;
             } else {
                 return false;
@@ -99,7 +105,8 @@ class TString {
         }
 
         bool operator > (const TString& In) {
-            for (int i = 0; (i < size - 1) && (i < In.size - 1); ++i) {
+            int i = 0;
+            for (; stor[i] != '\0' && In.stor[i] != '\0'; ++i) {
                 if (stor[i] != In.stor[i]) {
                     if (stor[i] > In.stor[i]) {
                         return true;
@@ -108,14 +115,15 @@ class TString {
                     }
                 }
             }
-            if (size > In.size) {
+            if ((stor[i] != '\0') && (In.stor[i] == '\0')) {
                 return true;
             } else {
                 return false;
             }
         }
         bool operator>= (const TString& In) {
-            for (int i = 0; (i < size - 1) && (i < In.size - 1); ++i) {
+            int i = 0;
+            for (; stor[i] != '\0' && In.stor[i] != '\0'; ++i) {
                 if (stor[i] != In.stor[i]) {
                     if (stor[i] >= In.stor[i]) {
                         return true;
@@ -124,43 +132,47 @@ class TString {
                     }
                 }
             }
-            if (size >= In.size) {
+            if ((stor[i] == '\0' && In.stor[i] == '\0') || (stor[i] != '\0' && In.stor[i] == '\0'))  {
                 return true;
             } else {
                 return false;
             }
         }
         bool operator== (const TString& In) {
-            if (size != In.size) {
-                return false;
-            }
-            for (int i = 0; i < size - 1; ++i) {
+            int i = 0;
+            for (; stor[i] != '\0' && In.stor[i] != '\0'; ++i) {
                 if (stor[i] != In.stor[i]) {
-                        return false;
+                    return false;
                 }
+            }
+            if (stor[i] != In.stor[i]) {
+                return false;
             }
             return true;
         }
 
         char operator[] (int n) {
-            if (n < 0 || n > size) {
+            if (n < 0 || n > 257) {
                 throw std::out_of_range("You are doing this wrong!");
             }
             return stor[n];
         }
+        char* CStr() {
+            return stor;
+        }
         ~TString() {
-            delete[] stor;
+            //delete[] stor;
         }
 
     private:
         
-        char* stor;
-        int size;
+        char stor[257];
 };
 
 int main() {
+    std::ios::sync_with_stdio(false);
     using String = TString;
-    TBTree<String, unsigned long long, 3> tree;
+    TBTree<String, unsigned long long, 10> tree;
     String command;
     String key;
     unsigned long long val;
@@ -169,25 +181,52 @@ int main() {
         if (command[0] == '+') {
             std::cin >> key >> val;
             if(tree.add(key,val)) {
-                std::cout << "OK\n";
+                //std::cout << "OK\n";
+                puts("OK");
             } else {
-                std::cout << "Exist\n";
+                //std::cout << "Exist\n";
+                puts("Exist");
             }
         } else if (command[0] == '-') {
             std::cin >> key;
             if(tree.del(key)) {
-                std::cout << "OK\n";
+                //std::cout << "OK\n";
+                puts("OK");
             } else {
-                std::cout << "NoSuchWord\n";
+                //std::cout << "NoSuchWord\n";
+                puts("NoSuchWord");
             }
+        } else if (command[0] == '!') {
+            std::cin >> command >> key;
+            if (command[0] == 's') {
+                if(tree.Save(key.CStr())) {
+                    //std::cout << "OK\n";
+                    puts("OK");
+                } else {
+                    //std::cout << "ERROR:\n";
+                    puts("ERROR");
+                }
+            } else if (command[0] == 'l') {
+                if(tree.Load(key.CStr())) {
+                    //std::cout << "OK\n";
+                    puts("OK");
+                } else {
+                    //std::cout << "ERROR:\n";
+                    puts("ERROR");
+                }
+            }
+        /*
         } else if (command[0] == 'p') {
             tree.Print();
+        */
         } else {
             try {
                 val = tree.Find(command);
-                std::cout << "OK: " << val << '\n';
+                printf("OK: %llu\n", val);
+                //std::cout << "OK: " << val << '\n';
             } catch (int) {
-                std::cout << "NoSuchWord\n";
+                //std::cout << "NoSuchWord\n";
+                puts("NoSuchWord");
             }
         }
     }

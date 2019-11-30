@@ -1,6 +1,6 @@
 CC = g++
 LD = g++
-CCFLAGS = -Wall -g -pedantic -std=c++14
+CCFLAGS = -Wall -pedantic -std=c++11
 LDFLAGS =
 
 solution: main.cpp List.hpp BTree.hpp
