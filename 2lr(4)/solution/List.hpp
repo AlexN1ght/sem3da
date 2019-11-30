@@ -13,7 +13,7 @@ struct TLNode {
     TLNode(T& In) : value(In) {
         next = nullptr;
     }
-    TLNode(T&& In) : value(std::move(value)) {
+    TLNode(T&& In) : value(std::move(In)) {
         next = nullptr;
     }
     TLNode() {

@@ -29,10 +29,9 @@ class TString {
             //stor = new char[257];
             std::copy(In, In + 257, stor);
         }
-        TString(const TString& In) : {
+        TString(const TString& In) : TString(In.stor){
             //stor = new char[257];
             cop++;
-            std::copy(In.stor, In.stor + 257, stor);
         }
         TString(TString&& In) noexcept {
             //cop++;
@@ -197,7 +196,7 @@ class TString {
 int main() {
     cons = 0;
     cop = 0;
-    std::ios::sync_with_stdio(false);
+    // std::ios::sync_with_stdio(false);
     using String = TString;
     TBTree<String, unsigned long long, 10> tree;
     String command;
