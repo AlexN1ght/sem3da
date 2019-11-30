@@ -12,10 +12,10 @@ template <class K, class V, int T>
 class TKeyVal {
     using node_ptr = TNode<K,V,T>*;
     public:
-        TKeyVal() {
+        TKeyVal() : key(), value(0) {
             left = nullptr;
         }
-        TKeyVal(node_ptr to) {
+        TKeyVal(node_ptr to) : key(), value(0) {
             left = to;
         }
         TKeyVal(K& keyIn, V& valIn): key(keyIn), value(valIn) {
