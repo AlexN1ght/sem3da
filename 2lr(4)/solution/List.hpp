@@ -1,17 +1,33 @@
 #include <iostream>
 #include <cassert>
 
+int cons = 0;
+int cop = 0;
+int mov = 0;
+int Kcons = 0;
+int Kcop = 0;
+int Kmov = 0;
 
 template<class T>
 struct TLNode {
     TLNode(TLNode<T>* In) {
-        value = In->value;
+        value = new T(*In->value);
         next = In->next;
     }
+    TLNode(T* in) {
+        value = in;
+        next = nullptr;
+    }
+
     TLNode() {
         next = nullptr;
     }
-    T value;
+
+    ~TLNode() {
+        delete value;
+    }
+
+    T* value;
     TLNode<T>* next;
 };
 
@@ -40,9 +56,8 @@ class TList {
             }
             //ReSize();
         }
-        int PushBack(T value) {
-            node_ptr newEl{new TLNode<T>};
-            newEl->value = value;
+        int PushBack(T* value) {
+            node_ptr newEl{new TLNode<T>(value)};
             if (tail) {
                 tail->next = newEl;
             } else {
@@ -52,13 +67,13 @@ class TList {
             ++size;
             return 1;
         }
-        int Insert(int n, T value) {
+        int Insert(int n, T* value) {
             if (n < 0 || n > size) {
                 return -1;
             }
             if (n == 0) {
-                node_ptr newEl = new TLNode<T>;
-                newEl->value = value;
+                node_ptr newEl = new TLNode<T>(value);
+                //newEl->value = value;
                 newEl->next = head;
                 head = newEl;
                 size++;
@@ -72,8 +87,8 @@ class TList {
             for (int i = 0; i < n - 1; i++) {
                 tmp = tmp->next; 
             }
-            node_ptr newEl = new TLNode<T>;
-            newEl->value = value;
+            node_ptr newEl = new TLNode<T>(value);
+            //newEl->value = value;
             newEl->next = tmp->next;
             tmp->next = newEl;
             if (newEl->next == nullptr) {

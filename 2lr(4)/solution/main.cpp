@@ -19,13 +19,20 @@ char to_lo(char c) {
 class TString {
     public:
         TString(){
+            cons++;
             std::fill(stor, stor + 257, '\0');
         }
         TString(const TString& In){
+            cop++;
             std::copy(In.stor, In.stor + 257, stor);
         }
+        TString(TString&& In){
+            mov++;
+            std::swap(In.stor, stor);
+        }
 
-        TString operator= (const TString& In) {
+        TString& operator= (const TString& In) {
+            cop++;
             std::copy(In.stor, In.stor + 257, stor);
             return *this;
         }
@@ -36,23 +43,6 @@ class TString {
         }
 
         friend std::istream& operator>> (std::istream &is, TString& stI)  {
-            /*
-            is.sync();
-            TVector<char> temp;
-            while(is_space((char)is.peek())) {
-                if(is.get() == EOF) {
-                    return is;
-                }
-            }
-            while(!is_space((char)is.peek())) {
-                temp.Push_back(to_lo(is.get()));
-            }
-            temp.Push_back('\0');
-            delete[] stI.stor;
-            stI.size = temp.Size(); 
-            stI.stor = new char[stI.size];
-            std::copy(temp.Begin(), temp.End(), stI.stor);
-            */
             is.sync();
             int i = 0;
             while(is_space((char)is.peek())) {
@@ -69,86 +59,21 @@ class TString {
         }
 
         bool operator < (const TString& In) {
-            int i = 0;
-            for (; stor[i] != '\0' && In.stor[i] != '\0'; ++i) {
-                if (stor[i] != In.stor[i]) {
-                    if (stor[i] < In.stor[i]) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-            }
-            if ((stor[i] == '\0') && (In.stor[i] != '\0')){
-                return true;
-            } else {
-                return false;
-            }
+            return strcmp(stor, In.stor) < 0 ? 1 : 0;
         }
 
         bool operator <= (const TString& In) {
-            int i = 0;
-            for (; stor[i] != '\0' && In.stor[i] != '\0'; ++i) {
-                if (stor[i] != In.stor[i]) {
-                    if (stor[i] <= In.stor[i]) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-            }
-            if ((stor[i] == '\0' && In.stor[i] == '\0') || (stor[i] == '\0' && In.stor[i] != '\0')) {
-                return true;
-            } else {
-                return false;
-            }
+            return strcmp(stor, In.stor) <= 0 ? 1 : 0;
         }
 
         bool operator > (const TString& In) {
-            int i = 0;
-            for (; stor[i] != '\0' && In.stor[i] != '\0'; ++i) {
-                if (stor[i] != In.stor[i]) {
-                    if (stor[i] > In.stor[i]) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-            }
-            if ((stor[i] != '\0') && (In.stor[i] == '\0')) {
-                return true;
-            } else {
-                return false;
-            }
+            return strcmp(stor, In.stor) > 0 ? 1 : 0;
         }
         bool operator>= (const TString& In) {
-            int i = 0;
-            for (; stor[i] != '\0' && In.stor[i] != '\0'; ++i) {
-                if (stor[i] != In.stor[i]) {
-                    if (stor[i] >= In.stor[i]) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-            }
-            if ((stor[i] == '\0' && In.stor[i] == '\0') || (stor[i] != '\0' && In.stor[i] == '\0'))  {
-                return true;
-            } else {
-                return false;
-            }
+            return strcmp(stor, In.stor) >= 0 ? 1 : 0;
         }
         bool operator== (const TString& In) {
-            int i = 0;
-            for (; stor[i] != '\0' && In.stor[i] != '\0'; ++i) {
-                if (stor[i] != In.stor[i]) {
-                    return false;
-                }
-            }
-            if (stor[i] != In.stor[i]) {
-                return false;
-            }
-            return true;
+            return strcmp(stor, In.stor) == 0 ? 1 : 0;
         }
 
         char operator[] (int n) {
@@ -230,5 +155,6 @@ int main() {
             }
         }
     }
+    printf("cons: %d\ncop: %d\nmov: %d\nKcons: %d\nKcop: %d\nKmov: %d\n", cons, cop, mov, Kcons, Kcop, Kmov);
     return 0;
 }
