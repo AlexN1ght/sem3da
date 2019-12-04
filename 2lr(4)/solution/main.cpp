@@ -5,16 +5,6 @@
 #include "Vector.hpp"
 #include "BTree.hpp"
 
-bool is_space(char c) {
-    return (c == '\n' || c == ' ' || c == '\t' || c == EOF) ? true : false;
-}
-
-char to_lo(char c) {
-    if (c >= 'A' && c <= 'Z') {
-        return c + 'a' - 'A';
-    }
-    return c;
-}
 
 class TString {
     public:
@@ -43,18 +33,10 @@ class TString {
         }
 
         friend std::istream& operator>> (std::istream &is, TString& stI)  {
-            is.sync();
-            int i = 0;
-            while(is_space((char)is.peek())) {
-                if(is.get() == EOF) {
-                    return is;
-                }
+            std::cin >> stI.stor;
+            for(int i = 0; stI.stor[i] != '\0'; ++i) {
+                stI.stor[i] = (char)tolower(stI.stor[i]);
             }
-            while(!is_space((char)is.peek())) {
-                stI.stor[i] = (char)to_lo(is.get());
-                i++;
-            }
-            stI.stor[i] = '\0';
             return is;
         }
 
@@ -106,37 +88,29 @@ int main() {
         if (command[0] == '+') {
             std::cin >> key >> val;
             if(tree.add(key,val)) {
-                //std::cout << "OK\n";
                 puts("OK");
             } else {
-                //std::cout << "Exist\n";
                 puts("Exist");
             }
         } else if (command[0] == '-') {
             std::cin >> key;
             if(tree.del(key)) {
-                //std::cout << "OK\n";
                 puts("OK");
             } else {
-                //std::cout << "NoSuchWord\n";
                 puts("NoSuchWord");
             }
         } else if (command[0] == '!') {
             std::cin >> command >> key;
             if (command[0] == 's') {
                 if(tree.Save(key.CStr())) {
-                    //std::cout << "OK\n";
                     puts("OK");
                 } else {
-                    //std::cout << "ERROR:\n";
                     puts("ERROR");
                 }
             } else if (command[0] == 'l') {
                 if(tree.Load(key.CStr())) {
-                    //std::cout << "OK\n";
                     puts("OK");
                 } else {
-                    //std::cout << "ERROR:\n";
                     puts("ERROR");
                 }
             }
@@ -148,13 +122,10 @@ int main() {
             try {
                 val = tree.Find(command);
                 printf("OK: %llu\n", val);
-                //std::cout << "OK: " << val << '\n';
             } catch (int) {
-                //std::cout << "NoSuchWord\n";
                 puts("NoSuchWord");
             }
         }
     }
-    printf("cons: %d\ncop: %d\nmov: %d\nKcons: %d\nKcop: %d\nKmov: %d\n", cons, cop, mov, Kcons, Kcop, Kmov);
     return 0;
 }

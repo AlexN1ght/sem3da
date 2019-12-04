@@ -47,14 +47,12 @@ class TList {
         }
         void NHead(node_ptr H) {
             head = H;
-            //ReSize();
         }
         void NTail(node_ptr Ta) {
             tail = Ta;
             if (Ta) {
                 Ta->next = nullptr;
             }
-            //ReSize();
         }
         int PushBack(T* value) {
             node_ptr newEl{new TLNode<T>(value)};
@@ -73,7 +71,6 @@ class TList {
             }
             if (n == 0) {
                 node_ptr newEl = new TLNode<T>(value);
-                //newEl->value = value;
                 newEl->next = head;
                 head = newEl;
                 size++;
@@ -88,7 +85,6 @@ class TList {
                 tmp = tmp->next; 
             }
             node_ptr newEl = new TLNode<T>(value);
-            //newEl->value = value;
             newEl->next = tmp->next;
             tmp->next = newEl;
             if (newEl->next == nullptr) {
@@ -186,14 +182,6 @@ class TList {
         node_ptr Last() {
             return tail;
         }
-        /*
-        int Find(T in) {
-            node_ptr tmp = head;
-            while(tmp != tail) {
-                tmp = tmp->next; 
-            }
-        }
-        */
 
         void ReSize() {
             if (!head) {

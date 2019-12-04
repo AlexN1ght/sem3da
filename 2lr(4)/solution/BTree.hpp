@@ -277,10 +277,7 @@ class TNode {
                 return 1;
             } else if (prev->addFLBrother(keys.Get(0)->value->key)) {
                 return 1;
-            } else if (prev->keys.Size() - 1 == T - 1) {
-                //prev->AddExt();
-            }
-            if (prev->JoinR(keys.Get(0)->value->key)) {
+            } else if (prev->JoinR(keys.Get(0)->value->key)) {
                 return 1;
             } else if (prev->JoinL(keys.Get(0)->value->key)) {
                 return 1;
@@ -480,8 +477,6 @@ class TBTree {
         ~TBTree() {
             delete root;
         }
-    private:
-        //node_ptr root;
 };
 
 
