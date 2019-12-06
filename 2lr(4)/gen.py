@@ -19,7 +19,7 @@ import time
 str_length = 40
 # exec_path  = "../build/run" # path to yours executable
 exec_path  = "solution/solution" # path to yours executable
-pic_fold = "format/pic/"
+pic_fold = ""
 out_test_file = "./generated.tst"
 
 invalid_val = -1
@@ -31,7 +31,7 @@ run_tests        = True
 save_tests       = True
 load_tests       = True
 save_main_test   = True
-build_benchmark  = False
+build_benchmark  = True
 
 # create array of array
 def preprocess_tests(arr):
@@ -125,7 +125,7 @@ def create_inp(arr):
 
 nums  = []
 times = []
-num_qty = 1;
+num_qty = 10;
 num_max = int(sys.argv[1])
 if len(sys.argv) > 2: num_qty = int(sys.argv[2])
 if output_process: print("running tests for", nums)
