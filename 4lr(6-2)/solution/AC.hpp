@@ -4,15 +4,17 @@
 #include <unordered_map>
 
 
-
 template <class K>
 class TTrie {
     public:
-        TTrie(): maxId(0){
+        TTrie(): shift(0), count(0) {
             root = new TACNode<K>(-1);
         }
 
         void add(const K* key, size_t size) {
+            if (size == 0) {
+                return;
+            }
             TACNode<K>* tmp = root;
             for(int i = 0; i < size; i++) {
                 if (tmp->next.find(key[i]) == tmp->next.end()) {
@@ -22,7 +24,10 @@ class TTrie {
                     tmp = tmp->next[key[i]];
                 }
             }
-            tmp->id = ++maxId;
+            tmp->shift.push_back(shift);
+            shift += size;
+            tmp->size = size;
+            tmp->id = ++count;
         }
         void add(std::string key) {
             add(key.c_str(), key.size());
@@ -32,7 +37,7 @@ class TTrie {
             root->link();
         }
 
-        void print(int deep) {
+        void print() {
             std::cout << "root=" << size_t(root) << '\n';
             root->print(0);
         }
@@ -40,12 +45,11 @@ class TTrie {
             delete root;
         }
 
-    private:
         template <class KN>
         class TACNode {
             public:
-                TACNode(): id(0), failLink(nullptr), outputLink(nullptr) {}
-                TACNode(int id): id(id), failLink(nullptr), outputLink(nullptr) {}
+                TACNode(): id(0), size(0), failLink(nullptr), outputLink(nullptr) {}
+                TACNode(int id): id(id), size(0), failLink(nullptr), outputLink(nullptr) {}
 
                 void link() {
                     std::queue<std::pair<TACNode<KN>* ,std::pair<KN, TACNode<KN>* >>> wide;
@@ -108,10 +112,13 @@ class TTrie {
                 }
 
                 int id;
+                int size;
+                std::vector<int> shift;
                 std::unordered_map<KN, TACNode<KN>*> next;
                 TACNode<KN>* failLink;
                 TACNode<KN>* outputLink;
         };
-        int maxId;
+        int shift;
+        int count;
         TACNode<K>* root;
 };
