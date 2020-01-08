@@ -16,7 +16,7 @@ class TTrie {
                 return;
             }
             TACNode<K>* tmp = root;
-            for(int i = 0; i < size; i++) {
+            for(size_t i = 0; i < size; i++) {
                 if (tmp->next.find(key[i]) == tmp->next.end()) {
                     tmp->next[key[i]] = new TACNode<K>;
                     tmp = tmp->next[key[i]];
@@ -31,6 +31,18 @@ class TTrie {
         }
         void add(std::string key) {
             add(key.c_str(), key.size());
+        }
+
+        void addJoker() {
+            ++shift;
+        }
+
+        size_t Size() {
+            return shift;
+        }
+
+        size_t Count() {
+            return count;
         }
 
         void link() {
@@ -48,14 +60,15 @@ class TTrie {
         template <class KN>
         class TACNode {
             public:
+                using map_pair = std::pair<TACNode<KN>* ,std::pair<KN, TACNode<KN>* >>;
                 TACNode(): id(0), size(0), failLink(nullptr), outputLink(nullptr) {}
                 TACNode(int id): id(id), size(0), failLink(nullptr), outputLink(nullptr) {}
 
                 void link() {
-                    std::queue<std::pair<TACNode<KN>* ,std::pair<KN, TACNode<KN>* >>> wide;
+                    std::queue<map_pair> wide;
                     
-                    for (auto i: next) {
-                        wide.push(std::pair<TACNode<KN>* ,std::pair<KN, TACNode<KN>* >>(this, i));
+                    for (std::pair<KN, TACNode<KN>*>  i: next) {
+                        wide.push(map_pair(this, i));
                     }
 
                     TACNode<K>* tmp;
@@ -85,15 +98,15 @@ class TTrie {
                         } else {
                             i.second->failLink = tmp;
                         }
-                        for (auto k: i.second->next) {
-                            wide.push(std::pair<TACNode<KN>* ,std::pair<KN, TACNode<KN>* >>(i.second, k));
+                        for (std::pair<KN, TACNode<KN>* > k: i.second->next) {
+                            wide.push(map_pair(i.second, k));
                         }
                         wide.pop();
                     }
                 }
 
                 void print(int deep) {
-                    for (auto i: next) {
+                    for (std::pair<KN, TACNode<KN>*>  i: next) {
                         for (int k = 0; k < deep; k++) {
                             putchar('\t');
                         }
@@ -106,19 +119,19 @@ class TTrie {
                 }
 
                 ~TACNode() {
-                    for (auto i: next) {
+                    for (std::pair<KN, TACNode<KN>*>  i: next) {
                         delete i.second;
                     }
                 }
 
-                int id;
-                int size;
-                std::vector<int> shift;
+                long id;
+                size_t size;
+                std::vector<size_t> shift;
                 std::unordered_map<KN, TACNode<KN>*> next;
                 TACNode<KN>* failLink;
                 TACNode<KN>* outputLink;
         };
-        int shift;
-        int count;
+        size_t shift;
+        size_t count;
         TACNode<K>* root;
 };

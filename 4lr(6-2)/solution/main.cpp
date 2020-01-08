@@ -1,33 +1,30 @@
 #include <iostream>
 #include <sstream>
 #include "AC.hpp"
-#include <unordered_map>
 #include <vector>
 #include <string>
-#include <list>
 
 int main() {
     std::ios::sync_with_stdio(false);
-    TTrie<unsigned long> patt;
-    unsigned long tmpT;
+    TTrie<unsigned long long> patt;
+    unsigned long long tmpValue;
     char ch;
     
-    std::vector<unsigned long> tmpWord;
+    std::vector<unsigned long long> tmpWord;
     std::string lbuff;
     std::getline(std::cin, lbuff);
     std::istringstream buffS(lbuff);
-    while(1) {
-        if (buffS >> tmpT) {
-            tmpWord.push_back(tmpT);
+
+    while (true) {
+        if (buffS >> tmpValue) {
+            tmpWord.push_back(tmpValue);
         } else {
             buffS.clear();
             if (buffS >> ch) {
                 if (ch == '?') {
                     patt.add(tmpWord.data(), tmpWord.size());
-                    patt.shift += 1;
+                    patt.addJoker();
                     tmpWord.clear();
-                } else {
-                    std::cout << "what&!&!???";
                 }
             } else {
                 patt.add(tmpWord.data(), tmpWord.size());
@@ -38,64 +35,54 @@ int main() {
     }
     patt.link();
 
-    int line = 0;
-    int posInLine = 0;
+    size_t line = 0;
+    size_t posInLine = 0;
     size_t pos = 0;
-    std::unordered_map<int, std::pair<int, int>> ansMap;
-    TTrie<unsigned long>::TACNode<unsigned long>* tmp = patt.root;
-    std::unordered_map<size_t, int> ansBuff;
-    std::pair<int, int> ansTmp;
+    std::vector<std::pair<size_t, size_t>> ansMap;
+    TTrie<unsigned long long>::TACNode<unsigned long long>* tmp = patt.root;
+    std::vector<size_t> ansBuff;
+    std::pair<size_t, size_t> ansTmp;
 
     while (std::getline(std::cin, lbuff)) {
         std::istringstream buffS(lbuff);
         line++;
         posInLine = 0;
-        while (1) {
-            if (buffS >> tmpT) {
+        while (true) {
+            if (buffS >> tmpValue) {
+                ansBuff.push_back(0);
                 pos++;
                 posInLine++;
-                ansMap[pos] = std::pair<int,int>(line, posInLine);
+                ansMap.push_back(std::pair<int,int>(line, posInLine));
 
-                if (ansBuff.find(pos - patt.shift) == ansBuff.end()) {
-                    ansBuff.insert(std::pair<int, int>(pos - patt.shift, 1));
-                } else {
-                    ansBuff[pos - patt.shift]++;
-                }
-                if (ansBuff[pos - patt.shift] == patt.count + 1) {
-                    if ((int)pos - patt.shift >= 0) {
-                        ansTmp = ansMap[pos - patt.shift + 1];
+                if (((long)pos - (long)patt.Size()) >= 0) {
+                    ansBuff[pos - patt.Size()]++;
+                    if (ansBuff[pos - patt.Size()] == patt.Count() + 1 && patt.Size() != 0) {
+                        ansTmp = ansMap[pos - patt.Size()];
                         std::cout << ansTmp.first << ", " << ansTmp.second << '\n';
                     }
                 }
 
-                while (1) {
-                    if (tmp->next.find(tmpT) != tmp->next.end()) {
-                        tmp = tmp->next[tmpT];
+                while (true) {
+                    if (tmp->next.find(tmpValue) != tmp->next.end()) {
+                        tmp = tmp->next[tmpValue];
                         if (tmp->id > 0) {
-                            for (int i = 0; i < tmp->shift.size(); i++) {
-                                if (ansBuff.find(pos - tmp->size - tmp->shift[i]) == ansBuff.end()) {
-                                    ansBuff.insert(std::pair<int, int>(pos - tmp->size - tmp->shift[i], 1));
-                                } else {
+                            for (size_t i = 0; i < tmp->shift.size(); i++) {
+                                if (((long)pos - (long)tmp->size - (long)tmp->shift[i]) >= 0) {
                                     ansBuff[pos - tmp->size - tmp->shift[i]]++;
-                                }
-                                if (ansBuff[pos - tmp->size - tmp->shift[i]] == patt.count + 1) {
-                                    if ((int)pos - tmp->size - tmp->shift[i] >= 0) {
-                                        ansTmp = ansMap[pos - tmp->size - tmp->shift[i] + 1];
+                                    if (ansBuff[pos - tmp->size - tmp->shift[i]] == patt.Count() + 1 && patt.Size() != 0) {
+                                        ansTmp = ansMap[pos - tmp->size - tmp->shift[i]];
                                         std::cout << ansTmp.first << ", " << ansTmp.second << '\n';
                                     }
                                 }
                             }
                         }
                         if (tmp->outputLink != nullptr) {
-                            for (int i = 0; i < tmp->shift.size(); i++) {
-                                if (ansBuff.find(pos - tmp->outputLink->size - tmp->outputLink->shift[i]) == ansBuff.end()) {
-                                    ansBuff.insert(std::pair<int, int>(pos - tmp->size - tmp->shift[i], 1));
-                                } else {
+                            for (size_t i = 0; i < tmp->outputLink->shift.size(); i++) {
+                                if (((long)pos - (long)tmp->outputLink->size - (long)tmp->outputLink->shift[i]) >= 0) {
                                     ansBuff[pos - tmp->outputLink->size - tmp->outputLink->shift[i]]++;
-                                }
-                                if (ansBuff[pos - tmp->outputLink->size - tmp->outputLink->shift[i]] == patt.count + 1) {
-                                    if ((int)pos - tmp->size - tmp->shift[i] >= 0) {
-                                        ansTmp = ansMap[pos - tmp->size - tmp->shift[i] + 1];
+                                    if (ansBuff[pos - tmp->outputLink->size - tmp->outputLink->shift[i]] == patt.Count() + 1 &&
+                                            patt.Size() != 0) {
+                                        ansTmp = ansMap[pos - tmp->outputLink->size - tmp->outputLink->shift[i]];
                                         std::cout << ansTmp.first << ", " << ansTmp.second << '\n';
                                     }
                                 }
@@ -115,7 +102,6 @@ int main() {
 
         }
     }
-
     //patt.print();
     return 0;
 }
