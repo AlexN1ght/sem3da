@@ -32,90 +32,24 @@ save_main_test   = True
 build_benchmark  = True
 
 # create array of array
-def preprocess_tests(arr):
-    for i, entry in enumerate(arr):
-        p = random.random()
-        if p > 0.4:
-            entry[0] = "+ " + entry[0]
-        elif p < 0.4:
-            entry[0] = "- " + entry[0]
-            entry[1] = invalid_val
-        else:
-            entry[1] = invalid_val
 
 def generate_tests(qty):
     val_min = 0
     val_max = 200
 
-    letters = string.ascii_lowercase
-    tests = []
+    tests = ""
+    tests += ("1 2 3 4 ? 2 3 ? 1 2 2 3 ? 0 1\n")
     for _ in range(qty):
-        key = "".join(random.choice(letters) for _ in range(str_length)) 
-        # list1  = [str(key), str(val)]
-        tests.append([str(key), int(val)])
+        key = random.randint(val_min, val_max)
+        tests += (str(key) + '\n')
     return tests
 
 
 def check(inp,out):
-    # create my dictiony
-    # compare what returns implemented and program
-    d = {}
-    for i, entry in enumerate(inp):
-        key = entry[0].lower()
-        if key.startswith("+ "):
-            if key[2:] in d:
-                assert out[i] in "Exist", \
-                    "{}. error appending {} (must Exist) but get {}".format(
-                            i,
-                            key,
-                            out[i])
-            else:
-                d[key[2:]] = entry[1]
-                assert out[i] in "OK", \
-                    "{}. error appending {} (must OK) but get {}".format(
-                            i,
-                            key, 
-                            out[i])
-        elif key.startswith("- "):
-            val = d.pop(key[2:],None)
-            if val is not None:
-                assert out[i] in "OK", \
-                    "{}. error removing {} (must OK) but get {}".format(
-                            i,
-                            key,
-                            out[i])
-            else:
-                assert out[i] in "NoSuchWord", \
-                    "{}. error removing {} (must NSW) but get {}".format(
-                            i,
-                            key,
-                            out[i])
-        else:
-            val = d.get(key, None)
-            if val:
-                assert out[i] in "OK: {}".format(val), \
-                    "{}. error searching {} (must OK: {}) but get {}".format(
-                            i,
-                            key,
-                            val, out[i])
-            else:
-                assert out[i] in "NoSuchWord", \
-                    "{}. error searching {} (must NSW) but get {}".format(
-                            i,
-                            key,
-                            out[i])
     return True
 
-# create array of str inputs
-def create_inp(arr):
-    ret = []
-    for entry in arr:
-        if entry[0] in invalid_key:
-            continue
-        ret.append(entry[0])
-        if entry[1] != invalid_val:
-            ret[-1] += " " + str(entry[1])
-    return (ret)
+# create array of str inp
+
 
 
 
@@ -128,8 +62,9 @@ if output_process: print("running tests for", nums)
 
 if output_main_test or run_tests: 
     test_set = generate_tests(num_max)  # generate main test
-    preprocess_tests(test_set)  # append some chars, key words, etc
-inp = create_inp(test_set)
+    
+#preprocess_tests(test_set)  # append some chars, key words, etc
+inp = test_set
 print("generated")
 if output_main_test: 
     print("output main test:")
