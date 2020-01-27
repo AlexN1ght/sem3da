@@ -42,6 +42,7 @@ def generate_tests(qty):
     for _ in range(qty):
         key = random.randint(val_min, val_max)
         tests += (str(key) + '\n')
+    print(tests)
     return tests
 
 
@@ -71,7 +72,7 @@ if output_main_test:
     print("\n".join(inp))
 if save_main_test:
     with open(out_test_file, "w") as fl:
-        fl.write("\n".join(inp))
+        fl.write((inp))
 if run_tests: 
     for i in range(num_qty):
         num = int(num_max / (2 ** i))

@@ -1,5 +1,7 @@
 #!python3
 
+# написанно мной
+
 # will make several tests and record time
 
 # your program mast output only sorted sequence
@@ -50,7 +52,9 @@ def generate_tests(qty):
     letters = string.ascii_lowercase
     tests = []
     for _ in range(qty):
-        key = "".join(random.choice(letters) for _ in range(str_length)) 
+        key = "".join(random.choice(letters) for _ in range(str_length))
+        val = int(random.random() * (val_max-val_min) + val_min) 
+
         # list1  = [str(key), str(val)]
         tests.append([str(key), int(val)])
     return tests
